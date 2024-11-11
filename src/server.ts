@@ -19,11 +19,17 @@ const startServer = async () => {
     console.log("User connected", socket.id, socket.handshake.auth);
 
     socket.on("joinRoom", (room) => {
-      console.log(`joined room ${room}`);
+      console.log(`joined room ${room} ${new Date().toTimeString()}`);
       socket.join(room);
     });
 
+    socket.on("leaveRoom", (room) => {
+      console.log(`left room ${room} ${new Date().toTimeString()}`);
+      socket.leave(room);
+    });
+
     socket.on("message", (room, message) => {
+      console.log({ room, message });
       io.to(room).emit("message", { userId: socket.userId, message });
     });
 
