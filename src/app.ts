@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import api from "./routes/api";
+import authMiddleware from "./middleware/authMiddleware";
 
 const app = express();
 

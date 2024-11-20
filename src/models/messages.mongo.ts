@@ -1,7 +1,7 @@
 import mongoose, { SchemaTypes } from "mongoose";
 const { Schema, model } = mongoose;
 
-const conversationUserSchema = new Schema({
+const MessagesSchema = new Schema({
   conversation: {
     type: SchemaTypes.ObjectId,
     ref: "Conversation",
@@ -17,5 +17,5 @@ const conversationUserSchema = new Schema({
   media_url: String,
 });
 
-const ConversationUser = model("ConversationUser", conversationUserSchema);
-export default ConversationUser;
+const Message = model("Message", MessagesSchema);
+export default Message;
