@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import User, { IUser } from "../../models/users.mongo";
-import { comparePasswords } from "../../services/hash";
+import { comparePasswords, hashPassword } from "../../services/hash";
 import jwt from "jsonwebtoken";
 
 export const httpLogin = async (req: Request, res: Response) => {
@@ -13,6 +13,7 @@ export const httpLogin = async (req: Request, res: Response) => {
     const token = jwt.sign({ id: user?._id, email }, process.env.JWT_SECRET!, { expiresIn: "24h" });
     res.json({ token });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ message: "Login failed", error });
   }
 };
@@ -44,6 +45,26 @@ export const httpRegister = async (req: Request, res: Response) => {
     const user = await newUser.save();
     const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET!, { expiresIn: "24h" });
     res.status(201).json({ token, message: "User created successfully" });
+  } catch (error) {
+    res.status(400).json({ message: "Registration failed", error });
+  }
+};
+
+export const httpChangePassword = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({
+        error: "Credentials missing",
+      });
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const user = await User.findOneAndUpdate({ email }, { password: hashedPassword }, { new: true });
+
+    res.status(201).json({ user, message: "Password changed successfully" });
   } catch (error) {
     res.status(400).json({ message: "Registration failed", error });
   }

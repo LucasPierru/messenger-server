@@ -2,7 +2,7 @@ import { startSession } from "mongoose";
 import Conversation from "../models/conversations.mongo";
 import ConversationUser from "../models/conversationUsers.mongo";
 
-export const createConversation = async ({ name, userId }: { name: string; userId: string }) => {
+export const createConversation = async ({ name, users }: { name?: string; users: string[] }) => {
   const session = await startSession();
   session.startTransaction();
   try {
@@ -12,16 +12,18 @@ export const createConversation = async ({ name, userId }: { name: string; userI
     });
 
     const conversation = await newConversation.save();
-    const newConversationUser = new ConversationUser({
-      user: userId,
-      conversation: conversation._id,
-    });
-    const conversationUser = newConversationUser.save();
+    users.forEach(async (userId) => {
+      const newConversationUser = new ConversationUser({
+        user: userId,
+        conversation: conversation._id,
+      });
+      const conversationUser = newConversationUser.save();
+    })
     await session.commitTransaction();
-    return { conversation, conversationUser, error: null };
+    return { conversation, users, error: null };
   } catch (error) {
     await session.abortTransaction();
-    return { conversation: null, conversationUser: null, error };
+    return { conversation: null, users: null, error };
   } finally {
     await session.endSession();
   }
