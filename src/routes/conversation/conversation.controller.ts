@@ -44,7 +44,7 @@ export const httpGetConversations = async (req: Request, res: Response) => {
 export const httpGetConversation = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const messages = await Message.find({ conversation: id }).populate(["conversation", "user"]);
+    const messages = await Message.find({ conversation: id }).sort({ createdAt: -1 }).populate(["conversation", "user"]);
     res.status(200).json({ messages });
   } catch (error) {
     res.status(500).json({ message: "Can't get messages", error });

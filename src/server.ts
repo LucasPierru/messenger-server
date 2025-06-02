@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import app from "./app";
 import { Server, Socket } from "socket.io";
 import { mongoConnect } from "./services/mongo";
+import { createMessage } from "./services/messages";
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -48,9 +49,11 @@ const startServer = async () => {
       socket.leave(room);
     });
 
-    socket.on("message", (room, message) => {
-      console.log({ room, message });
-      io.to(room).emit("message", { userId: socket.userId, message });
+    socket.on("message", async (room, message) => {
+      //console.log({ room, message });
+      const { message: newMessage } = await createMessage({ conversationId: message.conversation, userId: message.user, content: message.content, mediaUrl: message.mediaUrl })
+
+      io.to(room).emit("message", { userId: socket.userId, message: newMessage });
     });
 
     socket.on("disconnect", () => {

@@ -17,6 +17,7 @@ export const createMessage = async ({ userId, conversationId, content, mediaUrl 
       user: userId,
       conversation: conversationId,
       content,
+      media_url: mediaUrl,
       createdAt: new Date(),
     });
 
@@ -25,8 +26,13 @@ export const createMessage = async ({ userId, conversationId, content, mediaUrl 
     conversation!.lastActive = new Date();
     await conversation?.save();
 
+    // Populate user and conversation after saving
+    const populatedMessage = await Message.findById(message._id)
+      .populate("user")
+      .populate("conversation");
+
     await session.commitTransaction();
-    return { message, error: null };
+    return { message: populatedMessage, error: null };
   } catch (error) {
     await session.abortTransaction();
     return { message: null, error };
