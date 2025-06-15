@@ -28,3 +28,20 @@ export const createConversation = async ({ name, users }: { name?: string; users
     await session.endSession();
   }
 };
+
+export const getLastConversationId = async (userId: string) => {
+  try {
+    const conversationUsers = await ConversationUser.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(1);
+
+    if (conversationUsers.length === 0) {
+      return null;
+    }
+
+    return conversationUsers[0].conversation;
+  } catch (error) {
+    console.error("Error getting last conversation:", error);
+    throw error;
+  }
+}

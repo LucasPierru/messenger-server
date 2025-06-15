@@ -12,6 +12,7 @@ const MessagesSchema = new Schema({
     ref: "User",
     required: true,
   },
+  isEdited: Boolean,
   createdAt: Date,
   content: String,
   media_url: String,

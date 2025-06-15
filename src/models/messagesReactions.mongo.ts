@@ -1,10 +1,10 @@
 import mongoose, { SchemaTypes } from "mongoose";
 const { Schema, model } = mongoose;
 
-const conversationUserSchema = new Schema({
-  conversation: {
+const MessagesReactionsSchema = new Schema({
+  message: {
     type: SchemaTypes.ObjectId,
-    ref: "Conversation",
+    ref: "Message",
     required: true,
   },
   user: {
@@ -12,10 +12,9 @@ const conversationUserSchema = new Schema({
     ref: "User",
     required: true,
   },
+  reactionType: String, // e.g., "like", "love", "laugh", etc.
   createdAt: Date,
-  lastActive: Date,
-  joinedAt: Date,
 });
 
-const ConversationUser = model("ConversationUser", conversationUserSchema);
-export default ConversationUser;
+const MessageReaction = model("MessageReaction", MessagesReactionsSchema);
+export default MessageReaction;

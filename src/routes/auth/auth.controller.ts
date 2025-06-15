@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User, { IUser } from "../../models/users.mongo";
 import { comparePasswords, hashPassword } from "../../services/hash";
 import jwt from "jsonwebtoken";
+import { getLastConversationId } from "../../services/conversation";
 
 export const httpLogin = async (req: Request, res: Response) => {
   try {
@@ -9,9 +10,11 @@ export const httpLogin = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
     if (!user || !(await comparePasswords(password, user.password))) {
       res.status(400).json({ message: "Invalid credentials" });
+      return;
     }
+    const lastConversation = await getLastConversationId(user._id.toString());
     const token = jwt.sign({ id: user?._id, email }, process.env.JWT_SECRET!, { expiresIn: "24h" });
-    res.json({ token });
+    res.json({ token, lastConversationId: lastConversation });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Login failed", error });

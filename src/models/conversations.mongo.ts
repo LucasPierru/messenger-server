@@ -3,6 +3,7 @@ const { Schema, model } = mongoose;
 
 const conversationSchema = new Schema({
   name: String,
+  pictureUrl: String,
   createdAt: Date,
   lastActive: Date,
 });
