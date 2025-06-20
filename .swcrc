@@ -13,6 +13,7 @@
     "externalHelpers": false,
     "keepClassNames": false
   },
+  "exclude": ["src/test"],
   "module": {
     "type": "commonjs",
     "strict": false,

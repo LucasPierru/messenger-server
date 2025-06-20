@@ -30,6 +30,7 @@ export const httpGetConversations = async (req: Request, res: Response) => {
 
         return {
           conversation: cu.conversation,
+          lastReadAt: cu.lastReadAt,
           lastMessage,
         };
       })
@@ -48,5 +49,16 @@ export const httpGetConversation = async (req: Request, res: Response) => {
     res.status(200).json({ messages });
   } catch (error) {
     res.status(500).json({ message: "Can't get messages", error });
+  }
+};
+
+export const httpReadConversation = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { readAt } = req.body;
+    const conversationUser = await ConversationUser.findOneAndUpdate({ conversation: id, user: req.user!.id }, { lastReadAt: readAt, lastActive: readAt }, { new: true });
+    res.status(200).json({ conversationUser });
+  } catch (error) {
+    res.status(500).json({ conversationUser: "Can't get conversation user", error });
   }
 };

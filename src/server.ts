@@ -5,7 +5,7 @@ import { Server, Socket } from "socket.io";
 import { mongoConnect } from "./services/mongo";
 import { createMessage } from "./services/messages";
 
-const server = createServer(app);
+export const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
