@@ -16,6 +16,7 @@ const MessagesSchema = new Schema({
   createdAt: Date,
   content: String,
   media_url: String,
+  seenBy: [{ type: Schema.Types.ObjectId, ref: "User" }], // for optional read receipts
 });
 
 const Message = model("Message", MessagesSchema);

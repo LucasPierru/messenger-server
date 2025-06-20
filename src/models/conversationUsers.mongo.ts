@@ -14,6 +14,7 @@ const conversationUserSchema = new Schema({
   },
   createdAt: Date,
   lastActive: Date,
+  lastReadAt: Date,
   joinedAt: Date,
 });
 

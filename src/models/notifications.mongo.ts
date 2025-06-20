@@ -2,9 +2,10 @@ import mongoose, { SchemaTypes } from "mongoose";
 const { Schema, model } = mongoose;
 
 const NotificationsSchema = new Schema({
-  status: {
-    type: String, enum: ["unread", "read"],
-    default: "unread",
+  recipient: {
+    type: SchemaTypes.ObjectId,
+    ref: "User",
+    required: false,
   },
   message: {
     type: SchemaTypes.ObjectId,
@@ -12,14 +13,11 @@ const NotificationsSchema = new Schema({
     required: true,
   },
   type: {
-    type: String, enum: ["message", "reaction", "mention"],
+    type: String, enum: ["message", "reaction", "mention", "invite", "other"],
     default: "message",
   },
-  targetedUser: {
-    type: SchemaTypes.ObjectId,
-    ref: "User",
-    required: false,
-  },
+  read: { type: Boolean, default: false },
+  conversation: { type: Schema.Types.ObjectId, ref: "Conversation" }, // context
   createdAt: Date,
 });
 

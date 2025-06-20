@@ -1,6 +1,7 @@
 import { startSession } from "mongoose";
 import Message from "../models/messages.mongo";
 import Conversation from "../models/conversations.mongo";
+import ConversationUser from "../models/conversationUsers.mongo";
 
 export type IMessage = {
   userId: string;
@@ -25,6 +26,9 @@ export const createMessage = async ({ userId, conversationId, content, mediaUrl 
     const conversation = await Conversation.findById(conversationId);
     conversation!.lastActive = new Date();
     await conversation?.save();
+    const conversationUser = await ConversationUser.findOne({ conversationId, user: userId });
+    conversationUser!.lastActive = new Date();
+    await conversationUser?.save();
 
     // Populate user and conversation after saving
     const populatedMessage = await Message.findById(message._id)
