@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { createConversation } from "../../services/conversation";
-import Conversation from "../../models/conversations.mongo";
 import ConversationUser from "../../models/conversationUsers.mongo";
 import Message from "../../models/messages.mongo";
-import mongoose from "mongoose";
+import { createMessage } from "../../services/messages";
+import { getReceiverSocketId, io } from "../../services/socket";
 
 export const httpCreateConversation = async (req: Request, res: Response) => {
   try {
@@ -60,5 +60,27 @@ export const httpReadConversation = async (req: Request, res: Response) => {
     res.status(200).json({ conversationUser });
   } catch (error) {
     res.status(500).json({ conversationUser: "Can't get conversation user", error });
+  }
+};
+
+export const httpCreateMessage = async (req: Request, res: Response) => {
+  try {
+    const { conversationId, content } = req.body;
+    const { message, receiverIds } = await createMessage({
+      userId: req.user!.id,
+      conversationId,
+      content,
+    })
+
+    for (const receiverId of receiverIds) {
+      const receiverSocketId = getReceiverSocketId(receiverId.toString())
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", message);
+      }
+    }
+    res.status(200).json({ message });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Couldn't create message", error });
   }
 };

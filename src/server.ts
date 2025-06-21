@@ -1,23 +1,14 @@
-import { createServer } from "http";
-import jwt from "jsonwebtoken";
-import app from "./app";
-import { Server, Socket } from "socket.io";
-import { mongoConnect } from "./services/mongo";
-import { createMessage } from "./services/messages";
 
-export const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+import express from "express";
+import { mongoConnect } from "./services/mongo";
+import { app, server } from "./services/socket"
+
+app.use(express.json());
 
 const startServer = async () => {
   await mongoConnect();
 
-  app.get("/", (req, res) => {
+  /* app.get("/", (req, res) => {
     res.send("Hello World!");
   });
 
@@ -50,7 +41,6 @@ const startServer = async () => {
     });
 
     socket.on("message", async (room, message) => {
-      //console.log({ room, message });
       const { message: newMessage } = await createMessage({ conversationId: message.conversation, userId: message.user, content: message.content, mediaUrl: message.mediaUrl })
 
       io.to(room).emit("message", { userId: socket.userId, message: newMessage });
@@ -59,7 +49,7 @@ const startServer = async () => {
     socket.on("disconnect", () => {
       console.log("User disconnected", socket.userId);
     });
-  });
+  }); */
 
   server.listen(4000, () => {
     console.log(`Server running in 4000`);

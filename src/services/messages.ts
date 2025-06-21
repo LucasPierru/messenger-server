@@ -23,23 +23,24 @@ export const createMessage = async ({ userId, conversationId, content, mediaUrl 
     });
 
     const message = await newMessage.save();
-    const conversation = await Conversation.findById(conversationId);
-    conversation!.lastActive = new Date();
-    await conversation?.save();
-    const conversationUser = await ConversationUser.findOne({ conversationId, user: userId });
-    conversationUser!.lastActive = new Date();
-    await conversationUser?.save();
+    const conversation = await Conversation.findByIdAndUpdate(conversationId, { lastActive: new Date() }, { new: true });
+    const conversationUser = await ConversationUser.findOneAndUpdate({ conversationId, user: userId }, {
+      lastActive: new Date(),
+    }, { new: true });
 
     // Populate user and conversation after saving
     const populatedMessage = await Message.findById(message._id)
-      .populate("user")
+      .populate("user", "-password")
       .populate("conversation");
 
+    const receiverIds = await ConversationUser.find({ conversation: conversationId }).where("_id").ne(userId).distinct("user");
+
     await session.commitTransaction();
-    return { message: populatedMessage, error: null };
+    return { message: populatedMessage, receiverIds: receiverIds, error: null };
   } catch (error) {
+    console.error("Error creating message:", error);
     await session.abortTransaction();
-    return { message: null, error };
+    return { message: null, receiverIds: [], error };
   } finally {
     await session.endSession();
   }
