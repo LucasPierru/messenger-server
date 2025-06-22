@@ -73,9 +73,8 @@ export const httpCreateMessage = async (req: Request, res: Response) => {
     })
 
     for (const receiverId of receiverIds) {
-      const receiverSocketId = getReceiverSocketId(receiverId.toString())
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", message);
+      if (receiverId) {
+        io.to(receiverId.toString()).emit("newMessage", message);
       }
     }
     res.status(200).json({ message });

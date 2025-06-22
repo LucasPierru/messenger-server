@@ -33,16 +33,17 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("A user connected", socket.id);
-
   const userId = socket.userId!;
-  if (userId) userSocketMap[userId] = socket.id;
+  console.log("A user connected", userId);
+  socket.join(userId);
+  if (userId) userSocketMap[userId] = userId;
 
   // io.emit() is used to send events to all the connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected", socket.id);
+    console.log("A user disconnected", userId);
+    socket.leave(userId);
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
