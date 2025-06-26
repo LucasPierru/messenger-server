@@ -14,7 +14,7 @@ export const httpLogin = async (req: Request, res: Response) => {
     }
     const lastConversation = await getLastConversationId(user._id.toString());
     const token = jwt.sign({ id: user?._id, email }, process.env.JWT_SECRET!, { expiresIn: "24h" });
-    res.json({ token, lastConversationId: lastConversation });
+    res.json({ token, user: { id: user._id, email: user.email }, lastConversationId: lastConversation });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Login failed", error });
@@ -47,7 +47,7 @@ export const httpRegister = async (req: Request, res: Response) => {
 
     const user = await newUser.save();
     const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET!, { expiresIn: "24h" });
-    res.status(201).json({ token, message: "User created successfully" });
+    res.status(201).json({ token, user: { id: newUser._id, email: newUser.email }, message: "User created successfully" });
   } catch (error) {
     res.status(400).json({ message: "Registration failed", error });
   }
@@ -70,5 +70,14 @@ export const httpChangePassword = async (req: Request, res: Response) => {
     res.status(201).json({ user, message: "Password changed successfully" });
   } catch (error) {
     res.status(400).json({ message: "Registration failed", error });
+  }
+};
+
+export const httpCheckAuth = async (req: Request, res: Response) => {
+  try {
+    res.status(201).json({ user: req.user });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed", error });
   }
 };
