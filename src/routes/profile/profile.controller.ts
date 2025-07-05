@@ -25,3 +25,20 @@ export const httpSearchProfiles = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Can't find any profiles", error });
   }
 };
+
+export const httpUpdateProfile = async (req: Request, res: Response) => {
+  const { bio, phoneNumber, location, gender, status } = req.body;
+
+  try {
+    const profile = await User.findByIdAndUpdate(req.user!.id, {
+      bio,
+      phoneNumber,
+      location,
+      gender,
+      status
+    }, { new: true }).select("-password -__v");
+    res.status(200).json({ profile });
+  } catch (error) {
+    res.status(500).json({ message: "Can't find any profiles", error });
+  }
+};

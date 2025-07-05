@@ -45,8 +45,9 @@ export const httpGetConversations = async (req: Request, res: Response) => {
 export const httpGetConversation = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const messages = await Message.find({ conversation: id }).sort({ createdAt: -1 }).populate(["conversation", "user"]);
-    res.status(200).json({ messages });
+    const { page = 1, limit = 20 } = req.query;
+    const messages = await Message.find({ conversation: id }).sort({ createdAt: -1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).populate(["conversation", "user"]);
+    res.status(200).json({ messages, hasMore: messages.length === Number(limit) });
   } catch (error) {
     res.status(500).json({ message: "Can't get messages", error });
   }
